@@ -1,7 +1,6 @@
 from lxml import html
 from bs4 import BeautifulSoup
-import requests
-import re
+import re, requests, zipfile, io
 
 def hue_scraper():
   base = 'http://uadata.org'
@@ -9,10 +8,23 @@ def hue_scraper():
   soup = BeautifulSoup(page.text, 'html.parser')
   a = soup.find_all('a')
   for link in a:
-    man = re.search('manhattan', link.get('href'), re.IGNORECASE)
-    brook = re.search('brooklyn', link.get('href'), re.IGNORECASE)
+    url = base + link.get('href')
+    man = re.search('manhattan', url, re.IGNORECASE)
+    brook = re.search('brooklyn', url, re.IGNORECASE)
     if man or brook:
-      print(base + link.get('href'))
+      if url[-3:] == 'pdf':
+        print('hey pdf', url)
+      # if pdf -->
+      elif url[-3:] == 'zip':
+        print('hey zip', url)
+        r = requests.get(url)
+        z = zipfile.ZipFile(io.BytesIO(r.content))
+        z.extractall()
+      # if zip -->
+
+      # print(requests.get(base + url))
+      # print(base + url)
+
 
 
 hue_scraper()
