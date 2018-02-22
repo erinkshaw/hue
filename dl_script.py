@@ -29,7 +29,7 @@ def hue_scraper():
         print(f'saving {file_name} to data directory...')
         urllib.request.urlretrieve(url, f'data/{file_name}')
 
-        if url[-3:] == 'zip':
+        if url.endswith('zip') :
             # ..then we need to find the file and then unzip it
             print(f'unzipping {file_name}...')
             z = zipfile.ZipFile(f'data/{file_name}', mode='r')
