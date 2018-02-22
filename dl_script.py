@@ -1,38 +1,48 @@
 from lxml import html
 from bs4 import BeautifulSoup
-import re, requests, zipfile, io
+import urllib.request
+import re, requests, zipfile, io, os, sys
 
 def hue_scraper():
-  base = 'http://uadata.org'
-  page = requests.get('http://uadata.org/hue/')
-  soup = BeautifulSoup(page.text, 'html.parser')
-  a = soup.find_all('a')
-  for link in a:
-    url = base + link.get('href')
-    man = re.search('manhattan', url, re.IGNORECASE)
-    brook = re.search('brooklyn', url, re.IGNORECASE)
-    if man or brook:
-      if url[-3:] == 'pdf':
-        print('hey pdf', url)
-      # if pdf -->
-      elif url[-3:] == 'zip':
-        print('hey zip', url)
-        r = requests.get(url)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        z.extractall()
-      # if zip -->
+  try:
+    # grabbing and parsing our html
+    base = 'http://uadata.org'
+    page = requests.get('http://uadata.org/hue/')
+    soup = BeautifulSoup(page.text, 'html.parser')
 
-      # print(requests.get(base + url))
-      # print(base + url)
+    # get all dem links
+    a = soup.find_all('a')
 
+    # loop through all anchor tags in the html
+    for link in a:
 
+      # relative url
+      url = base + link.get('href')
+
+      # grab specific filename from url
+      file_name = url.split('/')[-1]
+
+      # regex to identify links that hold data about manhattan or brooklyn
+      man = re.search('manhattan', url, re.IGNORECASE)
+      brook = re.search('brooklyn', url, re.IGNORECASE)
+
+      if man or brook:
+        print(f'saving {file_name} to data directory...')
+        urllib.request.urlretrieve(url, f'data/{file_name}')
+
+        if url[-3:] == 'zip':
+            # ..then we need to find the file and then unzip it
+            print(f'unzipping {file_name}...')
+            z = zipfile.ZipFile(f'data/{file_name}', mode='r')
+            z.extractall(path='data/')
+
+            # ..now it would be nice to delete the zip files
+            print(f'deleting {file_name}...')
+            os.remove(f'data/{file_name}')
+
+  except requests.exceptions.RequestException as e:
+      # catastrophic error. bail.
+      print (e)
+      sys.exit(1)
 
 hue_scraper()
-
-
-
-# request website interpreter
-# find all reference to 'brooklyn' or 'manhattan'
-  # will i need to use regex for this?
-# get links
-# download links to HUE directory!
