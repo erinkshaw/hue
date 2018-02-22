@@ -16,7 +16,7 @@ def hue_scraper():
     # loop through all anchor tags in the html
     for link in a:
 
-      # relative url
+      # absolute url
       url = base + link.get('href')
 
       # grab specific filename from url
