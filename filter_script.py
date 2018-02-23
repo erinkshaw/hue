@@ -1,11 +1,14 @@
-import os, glob, re
+import os, glob, re, sys
 
 def death_finder():
-  os.chdir("data/brooklyn/")
+  borough = sys.argv[1]
+  os.chdir(f'data/{borough}/')
+  os.mkdir(f'deaths')
 
-  for file in glob.glob("*.xlsx"):
+  for file in glob.glob('*.xlsx'):
       death = re.search('death', file, re.IGNORECASE)
       if death:
-        os.rename(f"{file}", f"deaths/{file}")
+        print(f'moving ye death file {file}')
+        os.rename(f'{file}', f'deaths/{file}')
 
 death_finder()

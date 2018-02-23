@@ -23,6 +23,7 @@ def hue_scraper():
 
       # regex to identify links that hold data about manhattan or brooklyn
       man = re.search('manhattan', url, re.IGNORECASE)
+      nyc = re.search('nyc', url, re.IGNORECASE)
       brook = re.search('brooklyn', url, re.IGNORECASE)
 
       if man or brook:
